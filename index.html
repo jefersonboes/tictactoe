@@ -1,0 +1,25 @@
+<!-- Tic Tac Toe - Game
+ * Copyright (C) 2020 Jeferson Boes
+ -->
+
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <title>Tic Tac Toe</title>
+    <script src="https://unpkg.com/mqtt@3.0.0/dist/mqtt.min.js"></script>
+    <script src="game_board.js"></script>    
+    <script src="game_client.js"></script>
+    <script src="game_controller.js"></script>
+  </head>
+  <body>
+    <button id="butNewGame">New Game</button>
+    <button id="butNewOnlineGame">New Online Game</button>
+    </br>
+    <label id="player"></label>
+    </br>
+    <canvas id="canvas" width="300" height="300"></canvas>
+    </br>
+    <label id="game_status">Game stopped</label>
+  </body>
+</html>
