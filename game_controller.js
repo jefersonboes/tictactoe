@@ -11,22 +11,43 @@ window.onload = function () {
     let canvas = document.getElementById('canvas');
     let player = document.getElementById('player');
     let game_status = document.getElementById('game_status');
+    let room = document.getElementById('room');
+    let wait_ping_count = 9999;
 
     butNewGame.addEventListener('click', function(evt) {
-        online_mode = false;
-        ogc.finalize_online_game();
-        gb.new_game();
+        if (online_mode) {
+            gb.new_game('x', false);
+            ogc.sendNewGame('o', false);
+        } else {
+            gb.new_game();
+        }
 
         notify_player_info('You: ' + gb.piece_type);
     });
 
-    butNewOnlineGame.addEventListener('click', function(evt) {
-        online_mode = true;
-        ogc.init_online_game();
-        gb.new_game('x', false);
-        ogc.sendNewGame('o', false);
+    butCreateRoom.addEventListener('click', function(evt) {
+        gb.end_game();
+        notify_player_info('');
+        ogc.createRoom();
+    });
 
-        notify_player_info('You: ' + gb.piece_type);
+    butConnectRoom.addEventListener('click', function(evt) {
+        let room_id = ogc.getCurrentRoomId();
+        if (room_id == null) room_id = '';
+        room_id = prompt("Enter room id", room_id);
+
+        if (room_id != null && room_id.trim() != '') {
+            ogc.connectToRoom(room_id);
+        }
+    });
+
+    butEndGame.addEventListener('click', function(evt) {
+        if (online_mode)
+            ogc.finalize_online_game();
+        else {
+            gb.end_game();
+            notify_player_info('');
+        }
     });
 
     gb.setOnPieceMoved(function (move) {
@@ -60,6 +81,29 @@ window.onload = function () {
         }
     });
 
+    ogc.setOnEndGame(function() {
+        gb.end_game();
+        online_mode = false;
+        window.location.href = get_current_url() + '\#room_id=';
+        notify_player_info('');
+        notify_room_info('');
+    });
+
+    ogc.setOnConnectedToRoom(function() {
+        notify_room_info('Current room id: ' + ogc.getCurrentRoomId());
+        gb.end_game();
+        notify_player_info('');
+
+        online_mode = true;
+        let url = get_current_url();
+        url += '\#room_id=' + ogc.getCurrentRoomId();
+        window.location.href = url;
+    });
+
+    ogc.setOnPingReceived(function() {
+        wait_ping_count = 0;
+    });
+
     gb.setOnNotifyStatus(notify_game_status);
     gb.init_game_board(canvas);
 
@@ -70,4 +114,49 @@ window.onload = function () {
     function notify_game_status(status) {
         game_status.innerHTML = status;
     }
+
+    function notify_room_info(room_info) {
+        room.innerHTML = room_info;
+    }
+
+    function get_current_url() {
+        let hash = window.location.hash;
+        let url = self.location.href;
+        url = url.replace(hash, '');
+
+        return url;
+    }
+
+    function check_room() {        
+        let url = get_current_url();
+        let hash = window.location.hash.replace('#', '');
+        let params = hash.split('=');
+
+         //get room in anchor
+        let room_id = null;
+        if (params.length > 1) {            
+            if (params[0].toLowerCase() == 'room_id')
+                room_id = params[1].trim();
+        }
+
+        if (room_id != null && room_id != '')
+            ogc.connectToRoom(room_id);
+    }
+
+    check_room();
+
+    window.addEventListener('hashchange', function() {
+        console.log('hashchange');
+
+        check_room();
+    });
+
+    setInterval(() => {
+        wait_ping_count++;
+        if (wait_ping_count > 10) {
+            opponent_status.innerHTML = 'No opponent online';
+        } else {
+            opponent_status.innerHTML = 'Opponent is online';
+        }
+    }, 100);
 }

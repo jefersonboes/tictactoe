@@ -71,6 +71,26 @@ class GameBoard {
         this.notify_game_status('player x plays');
     }
 
+    end_game() {
+        console.log('end_game');
+        
+        this.pieces = [
+            ['', '', ''],
+            ['', '', ''],
+            ['', '', ''],
+        ];
+        this.clicks = [];
+        this.piece_type = 'x';
+        this.invert_piece = true;
+        this.line_win = [false, false, false];
+        this.col_win = [false, false, false];
+        this.cross_win = [false, false];
+        this.game_runnning = false;
+        this.locked = false;
+    
+        this.notify_game_status('Game stopped');
+    }
+
     setOnPieceMoved(onPieceMoved) {
         this.onPieceMoved = onPieceMoved;
     }
@@ -192,8 +212,8 @@ class GameBoard {
 
             if (!canContinue) {
                 this.game_runnning = false;
-                this.notify_game_status('game over, no wins');
-                console.log('game over, no wins');
+                this.notify_game_status('game over, without winners');
+                console.log('game over, without winners');
             }
         }
     }

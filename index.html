@@ -6,7 +6,7 @@
 <html lang="en">
   <head>
     <meta charset="utf-8">
-    <title>Tic Tac Toe</title>
+    <title>Tic Tac Toe - Real time online game</title>
     <link href="/tictactoe/favicon.ico" rel="icon"/>
     <script src="https://unpkg.com/mqtt@3.0.0/dist/mqtt.min.js"></script>
     <script src="game_board.js"></script>    
@@ -15,12 +15,18 @@
   </head>
   <body>
     <button id="butNewGame">New Game</button>
-    <button id="butNewOnlineGame">New Online Game</button>
+    <button id="butCreateRoom">Create new room</button>
+    <button id="butConnectRoom">Connect to room</button>
+    <button id="butEndGame">End game</button>
+    </br>
+    <label id="room"></label>
     </br>
     <label id="player"></label>
     </br>
     <canvas id="canvas" width="300" height="300"></canvas>
     </br>
     <label id="game_status">Game stopped</label>
+    </br>
+    <label id="opponent_status">No opponent online</label>
   </body>
 </html>

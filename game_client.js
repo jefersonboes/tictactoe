@@ -8,8 +8,13 @@ class OnlineGameClient {
 
     constructor() {
         this.client = null;
+        this.room_id = null;
+        this.ping_interval = null;
         this.onMsgPieceMoved = null;
         this.onNewGame = null;
+        this.onEndGame = null;
+        this.onConnectedToRoom = null;
+        this.onPingReceived = null;
     }
 
     init_online_game() {        
@@ -40,7 +45,30 @@ class OnlineGameClient {
 
         this.client.on('message', (topic, msg) => {
             let msgObj = JSON.parse(msg);
-            if (msgObj.client_id == this.self_id || topic != topic_name)
+
+            if (topic != topic_name || msgObj.room_id != this.room_id)
+                return;
+            
+            if (msgObj.type == 'end_game') {
+                console.log('end game received');
+
+                if (msgObj.new_room_id != null && msgObj.new_room_id == this.room_id) {                
+                    console.log('ignored end game');
+                    return;
+                }
+             
+                this.client.end(true);
+                this.client = null;
+                this.room_id = null;
+                clearInterval(this.ping_interval);
+
+                if (this.onEndGame != null)
+                    this.onEndGame();
+
+                return;
+            }
+
+            if (msgObj.client_id == this.self_id)
                 return;
 
             if (msgObj.type == 'move') {
@@ -49,6 +77,9 @@ class OnlineGameClient {
             } else if (msgObj.type == 'new_game') {
                 if (this.onNewGame != null)
                     this.onNewGame(msgObj.piece_type, msgObj.invert_piece);
+            } else if (msgObj.type == 'ping') {
+                if (this.onPingReceived != null)
+                    this.onPingReceived();
             }
         });
 
@@ -66,19 +97,23 @@ class OnlineGameClient {
             let args = Array.prototype.slice.call(arguments);
             console.log.apply(console, args);
         }
+
+        let self = this;
+        this.ping_interval = setInterval(function() {
+            self.sendPing();
+        }, 1000);
     }
 
     finalize_online_game() {
-        if (this.client != null) {
-            this.client.end(true);
-            this.client = null;
-        }
+        if (this.client != null)
+            this.sendEndGame();
     }
 
     send_msg(msg) {
         if (this.client == null)
             return;
         msg.client_id = this.self_id;
+        msg.room_id = this.room_id;
         msg = JSON.stringify(msg)
         this.client.publish(topic_name, msg, {qos: 1});
     }    
@@ -89,6 +124,18 @@ class OnlineGameClient {
 
     setOnNewGame(onNewGame) {
         this.onNewGame = onNewGame;
+    }
+
+    setOnEndGame(onEndGame) {
+        this.onEndGame = onEndGame;
+    }
+
+    setOnConnectedToRoom(onConnectedToRoom) {
+        this.onConnectedToRoom = onConnectedToRoom;
+    }
+
+    setOnPingReceived(onPingReceived) {
+        this.onPingReceived = onPingReceived;
     }
 
     sendPieceMoved(move) {
@@ -108,5 +155,49 @@ class OnlineGameClient {
         };
 
         this.send_msg(new_game_msg);
+    }
+
+    sendEndGame(new_room_id = null) {
+        let end_game_msg = {
+            type: 'end_game',
+            new_room_id: new_room_id,
+        };
+
+        console.log('sending end game');
+        this.send_msg(end_game_msg);
+    }
+
+    sendPing() {
+        let ping_smg = {
+            type: 'ping',
+        }
+
+        this.send_msg(ping_smg);
+    }
+
+    connectToRoom(room_id) {
+        if (room_id == this.room_id)
+            return;
+                
+        this.sendEndGame(room_id);
+
+        this.room_id = room_id;
+        this.init_online_game();
+
+        console.log('connected to room id ' + this.room_id);
+
+        if (this.onConnectedToRoom != null)
+            this.onConnectedToRoom();
+    }
+
+    createRoom() {
+        let room_id = Math.random().toString(16).substr(2, 8);
+        this.connectToRoom(room_id);
+
+        return room_id;
+    }
+
+    getCurrentRoomId() {
+        return this.room_id;        
     }
 }
