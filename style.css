@@ -1,0 +1,45 @@
+body {
+    background-color: rgb(51, 51, 51);
+    font-size: 15pt;
+}
+
+#center-div {
+    display: table;
+    margin: 0 auto;
+}
+
+.center {
+    display: flex;
+    justify-content: center;
+}
+
+label {
+    color: white;
+}
+
+button {
+    font-size: 15pt;
+    background-color: rgb(3, 102, 214);
+    border-style: solid;
+    border-color: rgb(3, 102, 214);
+    border-width: 1pt;
+    border-radius: 6pt;
+    padding: 9pt 28pt;
+    color: white;
+    outline: none;
+}
+
+button:hover {
+    background-color: rgb(3, 128, 252);
+    border-color: rgb(3, 128, 252);
+    cursor: pointer;
+}
+
+button:active {
+    background-color: rgb(2, 80, 168);
+}
+
+button:focus {
+    border-style: solid;
+    border-color: rgb(30, 30, 30);
+}

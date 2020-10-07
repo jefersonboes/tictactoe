@@ -6,7 +6,7 @@ window.onload = function () {
     console.log("onload");
 
     let gb = new GameBoard();
-    let ogc = new OnlineGameClient();    
+    let ogc = new OnlineGameClient();
     let online_mode = false;
     let canvas = document.getElementById('canvas');
     let player = document.getElementById('player');
@@ -84,7 +84,7 @@ window.onload = function () {
     ogc.setOnEndGame(function() {
         gb.end_game();
         online_mode = false;
-        window.location.href = get_current_url() + '\#room_id=';
+        window.location.href = get_current_url() + '#room_id=';
         notify_player_info('');
         notify_room_info('');
     });
@@ -96,7 +96,7 @@ window.onload = function () {
 
         online_mode = true;
         let url = get_current_url();
-        url += '\#room_id=' + ogc.getCurrentRoomId();
+        url += '#room_id=' + ogc.getCurrentRoomId();
         window.location.href = url;
     });
 

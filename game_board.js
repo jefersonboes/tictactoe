@@ -8,10 +8,6 @@ class GameBoard {
         this.canvas = null;
         this.ctx = null;
 
-        this.width = 300;
-        this.height = 300;
-        this.piece_size = 25;
-
         this.pieces = [
             ['', '', ''],
             ['', '', ''],
@@ -27,6 +23,14 @@ class GameBoard {
         this.locked = true;
         this.onPieceMoved = null;
         this.onNotifyStatus = null;
+
+        this.update_size();
+    }
+
+    update_size() {
+        this.width = canvas.width;
+        this.height = canvas.height;
+        this.piece_size = Math.ceil(canvas.width / 3 * .4);
     }
 
     init_game_board(canvas) {
@@ -43,7 +47,12 @@ class GameBoard {
     
             self.detect_click_position(x, y);
         });
-            
+
+        this.canvas.addEventListener('mousedown', function(evt) {
+            //prevent text selects
+            evt.preventDefault();
+        });
+
         setInterval(function() {
             self.clear_clicks();
         }, 300);
@@ -259,7 +268,9 @@ class GameBoard {
     animate() {
         this.ctx.clearRect(0, 0, this.width, this.height);
         this.ctx.beginPath();
-    
+        this.ctx.strokeStyle = "rgb(166, 226, 46)";
+        this.ctx.fillStyle = "rgb(166, 226, 46)";
+        this.ctx.lineWidth = 5;
         this.draw_board();
         this.draw_pieces();
         this.draw_win_lines();
@@ -273,7 +284,7 @@ class GameBoard {
     
             this.ctx.beginPath();
             this.ctx.arc(x, y, 5, 0, 2 * Math.PI);
-            this.ctx.stroke();
+            this.ctx.fill();
         }
     }
     
@@ -296,7 +307,7 @@ class GameBoard {
             for (let y = 0; y < 3; y++) {
                 if (this.pieces[y][x] == 'o') {
                     this.ctx.beginPath();
-                    this.ctx.arc(this.width / 3 * x + (this.width / 3 / 2), this.height / 3 * y + (this.height / 3 / 2), this.piece_size, 0, 2 * Math.PI);
+                    this.ctx.arc(this.width / 3 * x + (this.width / 3 / 2), this.height / 3 * y + (this.height / 3 / 2), this.piece_size * .6, 0, 2 * Math.PI);
                     this.ctx.stroke();
                 } else if (this.pieces[y][x] == 'x') {
                     let xx = this.width / 3 * x + (this.width / 3 / 2 - this.piece_size / 2), yy = this.height / 3 * y + (this.height / 3 / 2 - this.piece_size / 2);

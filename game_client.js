@@ -77,6 +77,8 @@ class OnlineGameClient {
             } else if (msgObj.type == 'new_game') {
                 if (this.onNewGame != null)
                     this.onNewGame(msgObj.piece_type, msgObj.invert_piece);
+            } else if (msgObj.type == 'req_gb_content') {
+                //not implemented
             } else if (msgObj.type == 'ping') {
                 if (this.onPingReceived != null)
                     this.onPingReceived();
@@ -174,7 +176,7 @@ class OnlineGameClient {
 
         this.send_msg(ping_smg);
     }
-
+    
     connectToRoom(room_id) {
         if (room_id == this.room_id)
             return;
@@ -195,6 +197,14 @@ class OnlineGameClient {
         this.connectToRoom(room_id);
 
         return room_id;
+    }
+
+    requestGBContent() {
+        let req_gb_content_msg = {
+            type: 'req_gb_content',
+        };
+
+        this.send_msg(req_gb_content_msg);
     }
 
     getCurrentRoomId() {
