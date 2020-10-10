@@ -17,9 +17,11 @@ class OnlineGameClient {
         this.onPingReceived = null;
     }
 
-    init_online_game() {        
-        if (this.client != null)
+    init_online_game(callback) {
+        if (this.client != null) {
+            if (callback != null) callback();
             return;
+        }
 
         this.self_id = Math.random().toString(16).substr(2, 8);
 
@@ -40,6 +42,9 @@ class OnlineGameClient {
                     return;
                 }
                 log('subscribed to ' + topic_name + ' topic');
+
+                if (callback != null)
+                    callback();
             });
         });
 
@@ -177,14 +182,16 @@ class OnlineGameClient {
         this.send_msg(ping_smg);
     }
     
-    connectToRoom(room_id) {
-        if (room_id == this.room_id)
-            return;
+    connectToRoom(room_id, callback = null) {
+        if (room_id == this.room_id) {
+            if (callback != null) callback();            
+            return
+        };
                 
         this.sendEndGame(room_id);
 
         this.room_id = room_id;
-        this.init_online_game();
+        this.init_online_game(callback);
 
         console.log('connected to room id ' + this.room_id);
 
@@ -192,11 +199,9 @@ class OnlineGameClient {
             this.onConnectedToRoom();
     }
 
-    createRoom() {
+    createRoom(callback = null) {
         let room_id = Math.random().toString(16).substr(2, 8);
-        this.connectToRoom(room_id);
-
-        return room_id;
+        this.connectToRoom(room_id, callback);
     }
 
     requestGBContent() {

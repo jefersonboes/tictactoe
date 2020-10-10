@@ -26,9 +26,12 @@ window.onload = function () {
     });
 
     butCreateRoom.addEventListener('click', function(evt) {
+        setLoading(true);
         gb.end_game();
         notify_player_info('');
-        ogc.createRoom();
+        ogc.createRoom(() => {
+            setLoading(false);
+        });
     });
 
     butConnectRoom.addEventListener('click', function(evt) {
@@ -37,14 +40,14 @@ window.onload = function () {
         room_id = prompt("Enter room id", room_id);
 
         if (room_id != null && room_id.trim() != '') {
-            ogc.connectToRoom(room_id);
+            connect_to_room(room_id);
         }
     });
 
     butEndGame.addEventListener('click', function(evt) {
-        if (online_mode)
-            ogc.finalize_online_game();
-        else {
+        if (online_mode) {
+            end_online_game();
+        } else {
             gb.end_game();
             notify_player_info('');
         }
@@ -87,6 +90,7 @@ window.onload = function () {
         window.location.href = get_current_url() + '#room_id=';
         notify_player_info('');
         notify_room_info('');
+        setLoading(false);
     });
 
     ogc.setOnConnectedToRoom(function() {
@@ -127,6 +131,18 @@ window.onload = function () {
         return url;
     }
 
+    function connect_to_room(room_id) {
+        setLoading(true);
+        ogc.connectToRoom(room_id, () => {
+            setLoading(false);
+        });
+    }
+
+    function end_online_game() {
+        setLoading(true);
+        ogc.finalize_online_game();
+    }
+
     function check_room() {        
         let url = get_current_url();
         let hash = window.location.hash.replace('#', '');
@@ -139,8 +155,13 @@ window.onload = function () {
                 room_id = params[1].trim();
         }
 
-        if (room_id != null && room_id != '')
-            ogc.connectToRoom(room_id);
+        if (room_id == null || room_id.trim() == '') {
+            if (online_mode) end_online_game();
+            return;
+        }
+
+        if (room_id != null && room_id != '' && room_id != ogc.room_id)
+            connect_to_room(room_id);
     }
 
     check_room();
