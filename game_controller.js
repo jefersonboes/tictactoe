@@ -1,5 +1,6 @@
 /* Tic Tac Toe - Game
  * Copyright (C) 2020 Jeferson Boes
+ * Sounds from https://notificationsounds.com/notification-sounds
  */
 
 window.onload = function () {
@@ -70,6 +71,8 @@ window.onload = function () {
 
             gb.notify_piece_moved(move.x, move.y, move.piece);
             gb.lock_moves(false);
+
+            playAudioEffect(aunt);
         }
     });
 
@@ -81,6 +84,8 @@ window.onload = function () {
             gb.lock_moves(true);
 
             notify_player_info('You: ' + gb.piece_type);
+
+            playAudioEffect(aung);
         }
     });
 
@@ -115,8 +120,11 @@ window.onload = function () {
         player.innerHTML = info;
     }
 
-    function notify_game_status(status) {
+    function notify_game_status(status, game_over) {
         game_status.innerHTML = status;
+
+        if (game_over)
+            playAudioEffect(augo);
     }
 
     function notify_room_info(room_info) {
@@ -174,10 +182,31 @@ window.onload = function () {
 
     setInterval(() => {
         wait_ping_count++;
-        if (wait_ping_count > 10) {
-            opponent_status.innerHTML = 'No opponent online';
+        if (wait_ping_count > 20) {
+            let msg = 'No opponent online';
+            if (opponent_status.innerHTML != msg) {
+                opponent_status.innerHTML = msg;
+                playAudioEffect(auout);
+            }
         } else {
-            opponent_status.innerHTML = 'Opponent is online';
+            let msg = 'Opponent is online';
+            if (opponent_status.innerHTML != msg) {
+                opponent_status.innerHTML = msg;
+                playAudioEffect(auin);
+            }
         }
     }, 100);
+}
+
+function playAudioEffect(audio) {
+    audio.load();
+
+    const playPromise = audio.play()
+    if (playPromise !== undefined) {
+        playPromise.then(function() {
+            msg.style.display = 'none';
+        }).catch(function(error) {
+            msg.style.display = 'block';
+        });
+    }
 }

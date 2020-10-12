@@ -63,3 +63,8 @@ button:focus {
     -ms-transform: translateY(-50%);
     transform: translateY(-50%);
 }
+
+#msg {
+    color: white;
+    display: none;
+}

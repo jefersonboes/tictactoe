@@ -77,7 +77,7 @@ class GameBoard {
         this.game_runnning = true;
         this.locked = false;
     
-        this.notify_game_status('player x plays');
+        this.notify_game_status('player x plays', false);
     }
 
     end_game() {
@@ -97,7 +97,7 @@ class GameBoard {
         this.game_runnning = false;
         this.locked = false;
     
-        this.notify_game_status('Game stopped');
+        this.notify_game_status('Game stopped', false);
     }
 
     setOnPieceMoved(onPieceMoved) {
@@ -116,7 +116,7 @@ class GameBoard {
         else
             piece = 'o';
     
-        this.notify_game_status('player ' + piece + ' plays');
+        this.notify_game_status('player ' + piece + ' plays', false);
     
         this.detect_winner();
     }
@@ -129,9 +129,9 @@ class GameBoard {
         return this.locked;
     }
 
-    notify_game_status(status) {
+    notify_game_status(status, game_over) {
         if (this.onNotifyStatus != null)
-            this.onNotifyStatus(status);
+            this.onNotifyStatus(status, game_over);
     }
 
     clear_clicks() {
@@ -198,11 +198,11 @@ class GameBoard {
     
         if (check_pieces_win(this, 'x')) {
             this.game_runnning = false;
-            this.notify_game_status('player x winner');
+            this.notify_game_status('player x winner', true);
             console.log('player x winner');
         } else if (check_pieces_win(this, 'o')) {
             this.game_runnning = false;
-            this.notify_game_status('player o winner');
+            this.notify_game_status('player o winner', true);
             console.log('player o winner');
         } else {
             let canContinue = false;
@@ -221,7 +221,7 @@ class GameBoard {
 
             if (!canContinue) {
                 this.game_runnning = false;
-                this.notify_game_status('game over, without winners');
+                this.notify_game_status('game over, without winners', true);
                 console.log('game over, without winners');
             }
         }
@@ -249,7 +249,7 @@ class GameBoard {
             if (inverted_piece == 'o') inverted_piece = 'x'; else inverted_piece = 'o';
             if (this.invert_piece) this.piece_type = inverted_piece;
     
-            this.notify_game_status('player ' + inverted_piece + ' plays');
+            this.notify_game_status('player ' + inverted_piece + ' plays', false);
     
             if (this.onPieceMoved != null)
                 this.onPieceMoved({x: x, y: y, piece: piece});
