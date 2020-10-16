@@ -92,10 +92,11 @@ window.onload = function () {
     ogc.setOnEndGame(function() {
         gb.end_game();
         online_mode = false;
-        window.location.href = get_current_url() + '#room_id=';
+        wait_ping_count = 9999;
         notify_player_info('');
         notify_room_info('');
         setLoading(false);
+        window.location.href = get_current_url() + '#room_id=';
     });
 
     ogc.setOnConnectedToRoom(function() {
@@ -182,7 +183,7 @@ window.onload = function () {
 
     setInterval(() => {
         wait_ping_count++;
-        if (wait_ping_count > 20) {
+        if (wait_ping_count > 50) {
             let msg = 'No opponent online';
             if (opponent_status.innerHTML != msg) {
                 opponent_status.innerHTML = msg;
