@@ -23,8 +23,6 @@ class GameBoard {
         this.locked = true;
         this.onPieceMoved = null;
         this.onNotifyStatus = null;
-
-        this.update_size();
     }
 
     update_size() {
@@ -36,7 +34,9 @@ class GameBoard {
     init_game_board(canvas) {
         this.canvas = canvas;
         this.ctx = this.canvas.getContext("2d");
-    
+
+        this.update_size();
+
         let self = this;
         this.canvas.addEventListener('click', function(evt) {
             const rect = self.canvas.getBoundingClientRect();
